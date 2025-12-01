@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>เช็คอินอบรม</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1e40af;
+      --primary-dark: #1e3a8a;
+      --accent: #3b82f6;
+      --success: #16a34a;
+      --light: #f8fafc;
+      --gray: #64748b;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Kanit', sans-serif;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      min-height: 100vh;
+      padding: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: manipulation;
+    }
+    .card {
+      background: white;
+      border-radius: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+      width: 100%;
+      max-width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+      animation: slideUp 0.6s ease-out;
+    }
+    .header {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      text-align: center;
+      padding: 45px 20px 35px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 17px;
+      opacity: 0.95;
+    }
+    .body {
+      padding: 30px 25px;
+    }
+    #search {
+      width: 100%;
+      padding: 20px 22px;
+      font-size: 20px !important;
+      border: 2px solid #e2e8f0;
+      border-radius: 20px;
+      background: #f8fafc;
+      transition: all 0.3s;
+    }
+    #search:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
+      background: white;
+    }
+    .results {
+      margin-top: 16px;
+      max-height: 45vh;
+      overflow-y: auto;
+      border-radius: 18px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+    }
+    .result-item {
+      padding: 18px 20px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 18px;
+      background: white;
+      transition: all 0.2s;
+    }
+    .result-item:active {
+      background: #dbeafe;
+      transform: scale(0.98);
+    }
+    .result-item strong {
+      color: var(--primary);
+      font-weight: 600;
+    }
+    .result-item small {
+      color: var(--gray);
+      font-size: 15px;
+    }
+    .info {
+      margin-top: 30px;
+      padding: 28px;
+      background: linear-gradient(135deg, #eff6ff, #dbeafe);
+      border-radius: 20px;
+      text-align: center;
+      border: 2px solid #93c5fd;
+      display: none;
+    }
+    .info h2 {
+      font-size: 30px;
+      color: var(--primary-dark);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+    .info p {
+      font-size: 19px;
+      margin: 10px 0;
+      color: #1e293b;
+    }
+    button {
+      margin-top: 28px;
+      width: 100%;
+      padding: 22px;
+      font-size: 24px;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(to right, var(--primary), var(--accent));
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 10px 25px rgba(59,130,246,0.4);
+      transition: all 0.3s;
+    }
+    button:active {
+      transform: scale(0.96);
+    }
+    .success {
+      display: none;
+      text-align: center;
+      padding: 50px 20px;
+    }
+    .success h2 {
+      font-size: 36px;
+      color: var(--success);
+      margin-bottom: 20px;
+    }
+    .success p {
+      font-size: 24px;
+      margin: 15px 0;
+      color: #1e293b;
+    }
+    .success button {
+      width: 80%;
+      padding: 18px;
+      font-size: 22px;
+      margin-top: 30px;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(50px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    /* ปรับแต่ง Scrollbar ให้สวยบนมือถือ */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 10px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--primary);
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="header">
+      <h1>เช็คอินเข้าร่วมอบรม</h1>
+      <p>พิมพ์รหัสพนักงานหรือชื่อ</p>
+    </div>
+
+    <div class="body" id="mainForm">
+      <input type="text" id="search" placeholder="ค้นหา รหัส / ชื่อ..." autocomplete="off" autofocus />
+      <div class="results" id="results"></div>
+
+      <div class="info" id="info">
+        <h2 id="displayName">ชื่อ นามสกุล</h2>
+        <p id="displayDept">ฝ่าย/แผนก</p>
+        <p><strong>รหัสพนักงาน:</strong> <span id="displayId">0000</span></p>
+        <button onclick="submitCheckIn()">เข้าอบรม</button>
+      </div>
+    </div>
+
+    <div class="success" id="success">
+      <h2>เช็คอินสำเร็จ!</h2>
+      <p id="successName" style="font-size:28px;font-weight:600;"></p>
+      <p id="successTime" style="font-size:26px;color:var(--success);margin:20px 0;"></p>
+      <p style="font-size:20px;color:#374151;">ขอให้สนุกกับการอบรมนะคะ</p>
+      <button onclick="location.reload()">เช็คอินคนถัดไป</button>
+    </div>
+  </div>
+
+<script>
+// URL Web App ของคุณ (เปลี่ยนแค่บรรทัดนี้บรรทัดเดียว)
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw5_zoG3eBsyDjFRDWIC-Qb8Ueb93bomXz_o2wfG1cDtBreyME4cnQEWxggOPd3whH0Ww/exec";
+
+let selectedEmployee = null;
+
+const searchInput = document.getElementById('search');
+const resultsDiv = document.getElementById('results');
+const infoDiv = document.getElementById('info');
+
+// ทำให้คีย์บอร์ดโผล่ทันทีตอนเปิดหน้า (มือถือ)
+searchInput.focus();
+
+searchInput.addEventListener('input', function() {
+  const keyword = this.value.trim();
+  infoDiv.style.display = 'none';
+  resultsDiv.innerHTML = '';
+
+  if (keyword.length < 2) return;
+
+  fetch(`${WEB_APP_URL}?action=search&keyword=${encodeURIComponent(keyword)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.length === 0) {
+        resultsDiv.innerHTML = '<div class="result-item">ไม่พบข้อมูล</div>';
+        return;
+      }
+      resultsDiv.innerHTML = data.map(emp => `
+        <div class="result-item" onclick="selectEmp('${emp.id}','${emp.name}','${emp.surname}','${emp.dept}')">
+          <strong>${emp.id}</strong> - ${emp.name} ${emp.surname}<br>
+          <small>${emp.dept}</small>
+        </div>
+      `).join('');
+    })
+    .catch(() => {
+      resultsDiv.innerHTML = '<div class="result-item">เกิดข้อผิดพลาด กรุณาลองใหม่</div>';
+    });
+});
+
+function selectEmp(id, name, surname, dept) {
+  selectedEmployee = {id, name, surname, dept};
+  document.getElementById('displayName').textContent = name + ' ' + surname;
+  document.getElementById('displayDept').textContent = dept;
+  document.getElementById('displayId').textContent = id;
+  infoDiv.style.display = 'block';
+  resultsDiv.innerHTML = '';
+  searchInput.value = `${id} - ${name} ${surname}`;
+  // ปิดคีย์บอร์ดหลังเลือก (มือถือ)
+  searchInput.blur();
+}
+
+function submitCheckIn() {
+  if (!selectedEmployee) return;
+
+  const now = new Date();
+  const date = now.toLocaleDateString('th-TH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+  const time = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+
+  fetch(WEB_APP_URL, {
+    method: 'POST',
+    body: JSON.stringify({
+      action: 'checkin',
+      id: selectedEmployee.id,
+      name: selectedEmployee.name,
+      surname: selectedEmployee.surname,
+      dept: selectedEmployee.dept
+    }),
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(r => r.json())
+  .then(res => {
+    if (res.success) {
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('successName').textContent = selectedEmployee.name + ' ' + selectedEmployee.surname;
+      document.getElementById('successTime').textContent = `${date}   ${time} น.`;
+      document.getElementById('success').style.display = 'block';
+    } else {
+      alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+    }
+  });
+}
+</script>
+
+</body>
+</html>
