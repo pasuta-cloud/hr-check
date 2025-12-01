@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>เช็คอินอบรม</title>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>เช็คอินอบรม - ระบบอัจฉริยะ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --primary: #1e40af;
@@ -13,6 +13,7 @@
       --success: #16a34a;
       --light: #f8fafc;
       --gray: #64748b;
+      --dark: #1e293b;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
     body {
@@ -24,13 +25,13 @@
       align-items: center;
       justify-content: center;
       touch-action: manipulation;
+      color: var(--dark);
     }
     .card {
       background: white;
       border-radius: 28px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.3);
       width: 100%;
-      max-width: 100%;
       max-width: 480px;
       overflow: hidden;
       animation: slideUp 0.6s ease-out;
@@ -49,6 +50,7 @@
     .header p {
       font-size: 17px;
       opacity: 0.95;
+      font-weight: 300;
     }
     .body {
       padding: 30px 25px;
@@ -82,10 +84,14 @@
       font-size: 18px;
       background: white;
       transition: all 0.2s;
+      cursor: pointer;
     }
     .result-item:active {
       background: #dbeafe;
       transform: scale(0.98);
+    }
+    .result-item:hover {
+      background: #eff6ff;
     }
     .result-item strong {
       color: var(--primary);
@@ -113,7 +119,7 @@
     .info p {
       font-size: 19px;
       margin: 10px 0;
-      color: #1e293b;
+      color: var(--dark);
     }
     button {
       margin-top: 28px;
@@ -132,6 +138,9 @@
     button:active {
       transform: scale(0.96);
     }
+    button:hover {
+      box-shadow: 0 12px 30px rgba(59,130,246,0.5);
+    }
     .success {
       display: none;
       text-align: center;
@@ -141,11 +150,12 @@
       font-size: 36px;
       color: var(--success);
       margin-bottom: 20px;
+      font-weight: 700;
     }
     .success p {
       font-size: 24px;
       margin: 15px 0;
-      color: #1e293b;
+      color: var(--dark);
     }
     .success button {
       width: 80%;
@@ -157,7 +167,7 @@
       from { opacity: 0; transform: translateY(50px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    /* ปรับแต่ง Scrollbar ให้สวยบนมือถือ */
+    /* Scrollbar สวยบนมือถือ */
     ::-webkit-scrollbar {
       width: 8px;
     }
@@ -169,6 +179,12 @@
       background: var(--primary);
       border-radius: 10px;
     }
+    /* Loading spinner */
+    .loading {
+      text-align: center;
+      padding: 20px;
+      color: var(--gray);
+    }
   </style>
 </head>
 <body>
@@ -176,7 +192,7 @@
   <div class="card">
     <div class="header">
       <h1>เช็คอินเข้าร่วมอบรม</h1>
-      <p>พิมพ์รหัสพนักงานหรือชื่อ</p>
+      <p>พิมพ์รหัสพนักงานหรือชื่อเพื่อเริ่มต้น</p>
     </div>
 
     <div class="body" id="mainForm">
@@ -201,7 +217,7 @@
   </div>
 
 <script>
-// URL Web App ของคุณ (เปลี่ยนแค่บรรทัดนี้บรรทัดเดียว)
+// URL Web App ใหม่ของคุณ (ดีดีแล้ว!)
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxrma-nr2nsNwnL7O0t5kaFRD4InhVMxOo0vYgotlO7THs1iELWgQcc9tVTfpOrTqwc7A/exec";
 
 let selectedEmployee = null;
@@ -210,7 +226,7 @@ const searchInput = document.getElementById('search');
 const resultsDiv = document.getElementById('results');
 const infoDiv = document.getElementById('info');
 
-// ทำให้คีย์บอร์ดโผล่ทันทีตอนเปิดหน้า (มือถือ)
+// Focus คีย์บอร์ดทันที (มือถือ)
 searchInput.focus();
 
 searchInput.addEventListener('input', function() {
@@ -219,6 +235,9 @@ searchInput.addEventListener('input', function() {
   resultsDiv.innerHTML = '';
 
   if (keyword.length < 2) return;
+
+  // แสดง loading
+  resultsDiv.innerHTML = '<div class="loading">กำลังค้นหา...</div>';
 
   fetch(`${WEB_APP_URL}?action=search&keyword=${encodeURIComponent(keyword)}`)
     .then(r => r.json())
@@ -234,8 +253,9 @@ searchInput.addEventListener('input', function() {
         </div>
       `).join('');
     })
-    .catch(() => {
-      resultsDiv.innerHTML = '<div class="result-item">เกิดข้อผิดพลาด กรุณาลองใหม่</div>';
+    .catch(err => {
+      console.error('Search error:', err);
+      resultsDiv.innerHTML = '<div class="result-item">เกิดข้อผิดพลาดในการค้นหา</div>';
     });
 });
 
@@ -247,16 +267,21 @@ function selectEmp(id, name, surname, dept) {
   infoDiv.style.display = 'block';
   resultsDiv.innerHTML = '';
   searchInput.value = `${id} - ${name} ${surname}`;
-  // ปิดคีย์บอร์ดหลังเลือก (มือถือ)
-  searchInput.blur();
+  searchInput.blur(); // ปิดคีย์บอร์ด
 }
 
 function submitCheckIn() {
-  if (!selectedEmployee) return;
+  if (!selectedEmployee) return alert('กรุณาเลือกพนักงานก่อน');
 
   const now = new Date();
   const date = now.toLocaleDateString('th-TH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   const time = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+
+  // แสดง loading ในปุ่ม
+  const btn = event.target;
+  const originalText = btn.textContent;
+  btn.textContent = 'กำลังบันทึก...';
+  btn.disabled = true;
 
   fetch(WEB_APP_URL, {
     method: 'POST',
@@ -271,18 +296,26 @@ function submitCheckIn() {
   })
   .then(r => r.json())
   .then(res => {
+    console.log('Server response:', res); // Debug
+    btn.textContent = originalText;
+    btn.disabled = false;
     if (res.success) {
       document.getElementById('mainForm').style.display = 'none';
       document.getElementById('successName').textContent = selectedEmployee.name + ' ' + selectedEmployee.surname;
       document.getElementById('successTime').textContent = `${date}   ${time} น.`;
       document.getElementById('success').style.display = 'block';
     } else {
-      alert('เกิดข้อผิดพลาด กรุณาลองใหม่');
+      alert('เกิดข้อผิดพลาด: ' + (res.message || 'ไม่ทราบสาเหตุ'));
     }
+  })
+  .catch(err => {
+    console.error('Fetch error:', err);
+    btn.textContent = originalText;
+    btn.disabled = false;
+    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่');
   });
 }
 </script>
 
 </body>
-
 </html>
