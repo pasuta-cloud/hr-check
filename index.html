@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ระบบ Check-in องค์กร (GitHub API)</title>
     <style>
-        /* CSS โทนสีน้ำเงิน-ขาว ที่ดีที่สุด (เหมือนเดิม) */
+        /* CSS โทนสีน้ำเงิน-ขาว */
         body { 
             font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; display: flex;
             justify-content: center; align-items: flex-start; min-height: 100vh; padding-top: 50px;
@@ -71,7 +71,7 @@
 
     <script>
         // *** 🔴 สำคัญ: เปลี่ยน URL นี้เป็น Executable URL ที่ได้จากการ Deploy ใหม่ ***
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbx6VbqsJz23oyR4dnZSnOs4ciaD1vhuAtAnwJDbQgR4iCsRGKLSF4AElL43DGf62RQqjA/exec"; 
+        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxq9RD4fusTdqGHPVRskOU-QLoKzkpeZtJ82vvtnM4OuwWtlqRPHkSVVksI62FiLFKQVg/exec"; 
         // *************************************************************************
         
         var timerId;
@@ -82,8 +82,10 @@
 
         if (GAS_API_URL.includes("xxxxxxxx")) {
             apiStatus.innerHTML = '<span style="color:red; font-weight:bold;">❌ กรุณาอัปเดต API URL</span>';
+            showResult({status: 'info', message: 'กรุณาอัปเดต API URL ในโค้ด JavaScript ก่อนใช้งาน'});
         } else {
             apiStatus.innerHTML = '<span style="color:green; font-weight:bold;">✅ API พร้อมใช้งาน</span>';
+            showResult({status: 'info', message: 'พิมพ์อย่างน้อย 2 ตัวอักษรเพื่อค้นหา'});
         }
         
         // --- 1. ฟังก์ชันสื่อสารกับ Apps Script (API) ---
@@ -96,7 +98,6 @@
             try {
                 const response = await fetch(GAS_API_URL, {
                     method: 'POST',
-                    // 'no-cors' เป็นทางเลือก แต่ถ้าตั้งค่าถูกต้องควรใช้ 'cors'
                     mode: 'cors', 
                     headers: {
                         'Content-Type': 'application/json',
@@ -142,7 +143,7 @@
             resultDiv.classList.remove('loading');
             
             // Check for API Error
-            if (employees && employees.message) {
+            if (employees && employees.message && employees.status === 'error') {
                  showResult({status: 'error', message: employees.message}); 
                  return;
             }
@@ -165,7 +166,7 @@
             });
             
             resultsList.classList.add('has-results'); 
-            resultDiv.classList.remove('visible'); 
+            resultDiv.classList.remove('visible'); // ซ่อนข้อความสถานะเมื่อมีผลลัพธ์
         }
 
         async function confirmCheckin(employeeId, employeeName) {
@@ -186,7 +187,7 @@
         function handleCheckinResponse(result) {
             if (result.status === 'success') {
                 showResult(result);
-                inputField.value = ''; 
+                inputField.value = ''; // ล้างช่องค้นหาหลัง Check-in สำเร็จ
                 inputField.focus(); 
             } else {
                 showResult(result);
@@ -205,17 +206,17 @@
             } else if (result.status === 'loading') {
                 resultDiv.classList.add('loading');
             } else {
-                resultDiv.classList.add('success'); 
+                resultDiv.classList.add('success'); // 'info' messages
             }
         }
         
+        // เมื่อคลิกที่อื่น ให้ซ่อนผลการค้นหา
         document.addEventListener('click', function(event) {
             if (!event.target.closest('#searchBox')) {
                 resultsList.innerHTML = ''; 
                 resultsList.classList.remove('has-results');
             }
         });
-        showResult({status: 'info', message: 'ระบบพร้อม! (รอการอัปเดต API URL)'});
     </script>
 </body>
 </html>
