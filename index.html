@@ -1,322 +1,135 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-  <title>เช็คอินอบรม - ระบบอัจฉริยะ</title>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>เช็คอินอบรม</title>
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --primary: #1e40af;
-      --primary-dark: #1e3a8a;
-      --accent: #3b82f6;
-      --success: #16a34a;
-      --light: #f8fafc;
-      --gray: #64748b;
-      --dark: #1e293b;
-    }
-    * { margin:0; padding:0; box-sizing:border-box; }
-    body {
-      font-family: 'Kanit', sans-serif;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-      min-height: 100vh;
-      padding: 15px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      touch-action: manipulation;
-      color: var(--dark);
-    }
-    .card {
-      background: white;
-      border-radius: 28px;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-      width: 100%;
-      max-width: 480px;
-      overflow: hidden;
-      animation: slideUp 0.6s ease-out;
-    }
-    .header {
-      background: linear-gradient(135deg, var(--primary), var(--accent));
-      color: white;
-      text-align: center;
-      padding: 45px 20px 35px;
-    }
-    .header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .header p {
-      font-size: 17px;
-      opacity: 0.95;
-      font-weight: 300;
-    }
-    .body {
-      padding: 30px 25px;
-    }
-    #search {
-      width: 100%;
-      padding: 20px 22px;
-      font-size: 20px !important;
-      border: 2px solid #e2e8f0;
-      border-radius: 20px;
-      background: #f8fafc;
-      transition: all 0.3s;
-    }
-    #search:focus {
-      outline: none;
-      border-color: var(--primary);
-      box-shadow: 0 0 0 4px rgba(59,130,246,0.2);
-      background: white;
-    }
-    .results {
-      margin-top: 16px;
-      max-height: 45vh;
-      overflow-y: auto;
-      border-radius: 18px;
-      background: #f1f5f9;
-      border: 1px solid #cbd5e1;
-    }
-    .result-item {
-      padding: 18px 20px;
-      border-bottom: 1px solid #e2e8f0;
-      font-size: 18px;
-      background: white;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-    .result-item:active {
-      background: #dbeafe;
-      transform: scale(0.98);
-    }
-    .result-item:hover {
-      background: #eff6ff;
-    }
-    .result-item strong {
-      color: var(--primary);
-      font-weight: 600;
-    }
-    .result-item small {
-      color: var(--gray);
-      font-size: 15px;
-    }
-    .info {
-      margin-top: 30px;
-      padding: 28px;
-      background: linear-gradient(135deg, #eff6ff, #dbeafe);
-      border-radius: 20px;
-      text-align: center;
-      border: 2px solid #93c5fd;
-      display: none;
-    }
-    .info h2 {
-      font-size: 30px;
-      color: var(--primary-dark);
-      margin-bottom: 12px;
-      font-weight: 600;
-    }
-    .info p {
-      font-size: 19px;
-      margin: 10px 0;
-      color: var(--dark);
-    }
-    button {
-      margin-top: 28px;
-      width: 100%;
-      padding: 22px;
-      font-size: 24px;
-      font-weight: 600;
-      color: white;
-      background: linear-gradient(to right, var(--primary), var(--accent));
-      border: none;
-      border-radius: 20px;
-      cursor: pointer;
-      box-shadow: 0 10px 25px rgba(59,130,246,0.4);
-      transition: all 0.3s;
-    }
-    button:active {
-      transform: scale(0.96);
-    }
-    button:hover {
-      box-shadow: 0 12px 30px rgba(59,130,246,0.5);
-    }
-    .success {
-      display: none;
-      text-align: center;
-      padding: 50px 20px;
-    }
-    .success h2 {
-      font-size: 36px;
-      color: var(--success);
-      margin-bottom: 20px;
-      font-weight: 700;
-    }
-    .success p {
-      font-size: 24px;
-      margin: 15px 0;
-      color: var(--dark);
-    }
-    .success button {
-      width: 80%;
-      padding: 18px;
-      font-size: 22px;
-      margin-top: 30px;
-    }
-    @keyframes slideUp {
-      from { opacity: 0; transform: translateY(50px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    /* Scrollbar สวยบนมือถือ */
-    ::-webkit-scrollbar {
-      width: 8px;
-    }
-    ::-webkit-scrollbar-track {
-      background: #f1f5f9;
-      border-radius: 10px;
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--primary);
-      border-radius: 10px;
-    }
-    /* Loading spinner */
-    .loading {
-      text-align: center;
-      padding: 20px;
-      color: var(--gray);
-    }
+    :root { --p:#1e40af; --a:#3b82f6; --s:#16a34a; }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{font-family:'Kanit',sans-serif;background:#0f172a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:15px}
+    .card{background:#fff;color:#000;border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,0,0.4);width:100%;max-width:480px;overflow:hidden}
+    .h{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-align:center;padding:50px 20px}
+    .h h1{font-size:28px;font-weight:700}
+    .h p{font-size:17px;margin-top:8px;opacity:0.9}
+    .b{padding:35px 30px}
+    input{width:100%;padding:20px;font-size:20px;border:2px solid#e2e8f0;border-radius:20px;background:#f8fafc}
+    input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 5px rgba(59,130,246,0.2)}
+    .r{margin-top:15px;max-height:45vh;overflow-y:auto;border-radius:18px;background:#f8fafc}
+    .i{padding:18px 22px;border-bottom:1px solid#ddd;background:#fff;cursor:pointer;font-size:18px}
+    .i:active{background:#dbeafe;transform:scale(0.98)}
+    .i strong{color:var(--p)}
+    .info{margin-top:30px;padding:30px;background:#eff6ff;border:2px solid#93c5fd;border-radius:20px;text-align:center;display:none}
+    .info h2{font-size:30px;color:var(--p);margin-bottom:10px}
+    .info p{font-size:19px;margin:8px 0}
+    button{margin-top:30px;width:100%;padding:22px;font-size:24px;color:#fff;background:linear-gradient(to right,var(--p),var(--a));border:none;border-radius:20px;box-shadow:0 10px 30px rgba(59,130,246,0.4);cursor:pointer}
+    button:active{transform:scale(0.96)}
+    .ok{display:none;text-align:center;padding:60px 20px}
+    .ok h2{font-size:36px;color:var(--s);margin-bottom:20px}
+    .ok p{font-size:24px;margin:12px 0}
   </style>
 </head>
 <body>
-
   <div class="card">
-    <div class="header">
+    <div class="h">
       <h1>เช็คอินเข้าร่วมอบรม</h1>
-      <p>พิมพ์รหัสพนักงานหรือชื่อเพื่อเริ่มต้น</p>
+      <p>พิมพ์รหัสหรือชื่อ</p>
     </div>
-
-    <div class="body" id="mainForm">
-      <input type="text" id="search" placeholder="ค้นหา รหัส / ชื่อ..." autocomplete="off" autofocus />
-      <div class="results" id="results"></div>
-
-      <div class="info" id="info">
-        <h2 id="displayName">ชื่อ นามสกุล</h2>
-        <p id="displayDept">ฝ่าย/แผนก</p>
-        <p><strong>รหัสพนักงาน:</strong> <span id="displayId">0000</span></p>
-        <button onclick="submitCheckIn()">เข้าอบรม</button>
+    <div class="b" id="f">
+      <input type="text" id="s" placeholder="ค้นหา รหัส / ชื่อ..." autofocus>
+      <div class="r" id="r"></div>
+      <div class="info" id="i">
+        <h2 id="n"></h2>
+        <p id="d"></p>
+        <p><strong>รหัส:</strong> <span id="id"></span></p>
+        <button onclick="save()">เข้าอบรม</button>
       </div>
     </div>
-
-    <div class="success" id="success">
+    <div class="ok" id="ok">
       <h2>เช็คอินสำเร็จ!</h2>
-      <p id="successName" style="font-size:28px;font-weight:600;"></p>
-      <p id="successTime" style="font-size:26px;color:var(--success);margin:20px 0;"></p>
-      <p style="font-size:20px;color:#374151;">ขอให้สนุกกับการอบรมนะคะ</p>
-      <button onclick="location.reload()">เช็คอินคนถัดไป</button>
+      <p id="okn" style="font-size:28px;font-weight:600"></p>
+      <p id="okt" style="font-size:26px;color:var(--s)"></p>
+      <p style="margin-top:30px">ขอให้สนุกกับการอบรมนะคะ</p>
+      <button onclick="location.reload()" style="width:80%;margin-top:20px;padding:18px;font-size:22px">เช็คอินคนถัดไป</button>
     </div>
   </div>
 
 <script>
-// URL Web App ใหม่ของคุณ (ดีดีแล้ว!)
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwIqY4waNao4OvDuEc_3gSGiaEeaEWmDYepgUsyX3gz4l7ni4S56F95DipyaNXY8-xWJQ/exec";
+// เปลี่ยนแค่บรรทัดนี้! ใส่ URL ใหม่ที่ได้จากขั้นตอน 1
+const URL = "https://script.google.com/macros/s/AKfycbwIqY4waNao4OvDuEc_3gSGiaEeaEWmDYepgUsyX3gz4l7ni4S56F95DipyaNXY8-xWJQ/exec";
 
-let selectedEmployee = null;
+let sel = null;
 
-const searchInput = document.getElementById('search');
-const resultsDiv = document.getElementById('results');
-const infoDiv = document.getElementById('info');
+document.getElementById('s').addEventListener('input',()=>{  
+  let k = document.getElementById('s').value.trim();
+  document.getElementById('i').style.display='none';
+  document.getElementById('r').innerHTML = k.length<2 ? '' : '<div class="i">กำลังค้นหา...</div>';
 
-// Focus คีย์บอร์ดทันที (มือถือ)
-searchInput.focus();
+  if(k.length<2) return;
 
-searchInput.addEventListener('input', function() {
-  const keyword = this.value.trim();
-  infoDiv.style.display = 'none';
-  resultsDiv.innerHTML = '';
-
-  if (keyword.length < 2) return;
-
-  // แสดง loading
-  resultsDiv.innerHTML = '<div class="loading">กำลังค้นหา...</div>';
-
-  fetch(`${WEB_APP_URL}?action=search&keyword=${encodeURIComponent(keyword)}`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.length === 0) {
-        resultsDiv.innerHTML = '<div class="result-item">ไม่พบข้อมูล</div>';
+  fetch(`${URL}?action=search&keyword=${encodeURIComponent(k)}`)
+    .then(res=>res.json())
+    .then(d=>{
+      if(d.length===0){
+        document.getElementById('r').innerHTML='<div class="i">ไม่พบข้อมูล</div>';
         return;
       }
-      resultsDiv.innerHTML = data.map(emp => `
-        <div class="result-item" onclick="selectEmp('${emp.id}','${emp.name}','${emp.surname}','${emp.dept}')">
-          <strong>${emp.id}</strong> - ${emp.name} ${emp.surname}<br>
-          <small>${emp.dept}</small>
-        </div>
-      `).join('');
-    })
-    .catch(err => {
-      console.error('Search error:', err);
-      resultsDiv.innerHTML = '<div class="result-item">เกิดข้อผิดพลาดในการค้นหา</div>';
+      document.getElementById('r').innerHTML = d.map(e=>`
+        <div class="i" onclick="pick('${e.id}','${e.name}','${e.surname}','${e.dept}')">
+          <strong>${e.id}</strong> - ${e.name} ${e.surname}<br>
+          <small style="color:#64748b">${e.dept}</small>
+        </div>`).join('');
     });
 });
 
-function selectEmp(id, name, surname, dept) {
-  selectedEmployee = {id, name, surname, dept};
-  document.getElementById('displayName').textContent = name + ' ' + surname;
-  document.getElementById('displayDept').textContent = dept;
-  document.getElementById('displayId').textContent = id;
-  infoDiv.style.display = 'block';
-  resultsDiv.innerHTML = '';
-  searchInput.value = `${id} - ${name} ${surname}`;
-  searchInput.blur(); // ปิดคีย์บอร์ด
+function pick(id,name,surname,dept){
+  sel = {id,name,surname,dept};
+  document.getElementById('n').textContent = name+' '+surname;
+  document.getElementById('d').textContent = dept;
+  document.getElementById('id').textContent = id;
+  document.getElementById('i').style.display='block';
+  document.getElementById('r').innerHTML='';
+  document.getElementById('s').value = `${id} - ${name} ${surname}`;
+  document.getElementById('s').blur();
 }
 
-function submitCheckIn() {
-  if (!selectedEmployee) return alert('กรุณาเลือกพนักงานก่อน');
+function save(){
+  if(!sel) return alert("กรุณาเลือกพนักงาน");
 
-  const now = new Date();
-  const date = now.toLocaleDateString('th-TH', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
-  const time = now.toLocaleTimeString('th-TH', {hour:'2-digit', minute:'2-digit'});
+  let b = event.target;
+  let txt = b.textContent;
+  b.disabled=true; b.textContent="กำลังบันทึก...";
 
-  // แสดง loading ในปุ่ม
-  const btn = event.target;
-  const originalText = btn.textContent;
-  btn.textContent = 'กำลังบันทึก...';
-  btn.disabled = true;
-
-  fetch(WEB_APP_URL, {
-    method: 'POST',
-    body: JSON.stringify({
-      action: 'checkin',
-      id: selectedEmployee.id,
-      name: selectedEmployee.name,
-      surname: selectedEmployee.surname,
-      dept: selectedEmployee.dept
+  fetch(URL,{
+    method:'POST',
+    body:JSON.stringify({
+      action:'checkin',
+      id:sel.id,
+      name:sel.name,
+      surname:sel.surname,
+      dept:sel.dept
     }),
-    headers: { 'Content-Type': 'application/json' }
+    headers:{'Content-Type':'application/json'}
   })
-  .then(r => r.json())
-  .then(res => {
-    console.log('Server response:', res); // Debug
-    btn.textContent = originalText;
-    btn.disabled = false;
-    if (res.success) {
-      document.getElementById('mainForm').style.display = 'none';
-      document.getElementById('successName').textContent = selectedEmployee.name + ' ' + selectedEmployee.surname;
-      document.getElementById('successTime').textContent = `${date}   ${time} น.`;
-      document.getElementById('success').style.display = 'block';
-    } else {
-      alert('เกิดข้อผิดพลาด: ' + (res.message || 'ไม่ทราบสาเหตุ'));
+  .then(r=>r.json())
+  .then(res=>{
+    if(res.success){
+      let t = new Date().toLocaleString('th-TH');
+      document.getElementById('f').style.display='none';
+      document.getElementById('okn').textContent = sel.name+' '+sel.surname;
+      document.getElementById('okt').textContent = t;
+      document.getElementById('ok').style.display='block';
+    }else{
+      alert("ผิดพลาด: "+(res.message||'ไม่ทราบสาเหตุ'));
+      b.disabled=false; b.textContent=txt;
     }
   })
-  .catch(err => {
-    console.error('Fetch error:', err);
-    btn.textContent = originalText;
-    btn.disabled = false;
-    alert('เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่');
+  .catch(()=>{
+    alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ต");
+    b.disabled=false; b.textContent=txt;
   });
 }
 </script>
-
 </body>
 </html>
-
