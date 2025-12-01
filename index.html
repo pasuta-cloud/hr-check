@@ -1,222 +1,309 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-    <base target="_top">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบ Check-in องค์กร (GitHub API)</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>เข้าร่วมกิจกรรม | บริษัทของคุณ</title>
+    <meta name="description" content="ระบบลงทะเบียนเข้าร่วมกิจกรรมพนักงาน ด้วย Google Apps Script">
+
+    <!-- ฟอนต์ Prompt ที่โหลดได้แม้ไม่มีเน็ต (GitHub Pages ใช้ได้แน่นอน) -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
-        /* CSS โทนสีน้ำเงิน-ขาว */
-        body { 
-            font-family: 'Arial', sans-serif; margin: 0; padding: 0; background-color: #f8f9fa; display: flex;
-            justify-content: center; align-items: flex-start; min-height: 100vh; padding-top: 50px;
+        :root {
+            --primary: #003087;
+            --primary-light: #0044cc;
+            --accent: #0066ff;
+            --gray-bg: #f8faff;
+            --gray-border: #e2e8f0;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --shadow: 0 20px 40px rgba(0, 48, 135, 0.12);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #f0f4ff 0%, #e6ecff 100%);
+            min-height: 100vh;
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
         .container {
-            background-color: #ffffff; padding: 30px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); 
-            width: 90%; max-width: 450px; text-align: center; border-top: 5px solid #004085;
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 48, 135, 0.08);
         }
-        h2 { color: #004085; margin-bottom: 30px; font-size: 1.8em; font-weight: 600; }
-        #searchBox { position: relative; }
-        #idInput { 
-            width: 100%; padding: 15px; border: 1px solid #ced4da; border-radius: 4px; font-size: 1.1em; 
-            box-sizing: border-box; transition: border-color 0.3s;
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: white;
+            padding: 36px 24px;
+            text-align: center;
         }
-        #idInput:focus { border-color: #007bff; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); outline: none; }
+
+        .header h2 {
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header p {
+            margin-top: 10px;
+            font-size: 1.02rem;
+            opacity: 0.95;
+        }
+
+        .content {
+            padding: 32px 28px;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        #idInput {
+            width: 100%;
+            padding: 19px 24px;
+            font-size: 1.15rem;
+            font-family: 'Prompt', sans-serif;
+            border: 2px solid var(--gray-border);
+            border-radius: 16px;
+            background: #fcfdff;
+            transition: all 0.35s ease;
+        }
+
+        #idInput::placeholder {
+            color: #94a3b8;
+        }
+
+        #idInput:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 0 0 5px rgba(0, 102, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
         #searchResults {
-            list-style: none; padding: 0; margin: 0; background-color: #fff; border: 1px solid #ced4da;
-            border-top: none; border-radius: 0 0 4px 4px; max-height: 250px; overflow-y: auto; 
-            position: absolute; width: 100%; z-index: 100; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-width: 0; box-shadow: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 0 0 16px 16px;
+            max-height: 360px;
+            overflow-y: auto;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--accent);
+            border-top: none;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-12px);
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
         }
-        .has-results { border-width: 1px !important; }
+
+        #searchResults.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
         .result-item {
-            padding: 12px; text-align: left; border-bottom: 1px solid #e9ecef; cursor: pointer;
-            transition: background-color 0.2s; font-size: 1.0em;
+            padding: 18px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: all 0.25s ease;
         }
-        .result-item:last-child { border-bottom: none; }
-        .result-item:hover { background-color: #e0f0ff; }
-        .item-name { font-weight: 500; color: #343a40; }
-        .item-id { color: #6c757d; font-size: 0.9em; display: block; margin-top: 5px; }
-        #result { 
-            margin-top: 25px; padding: 15px; border-radius: 4px; font-size: 1.0em; opacity: 0; 
-            transition: opacity 0.5s ease; min-height: 50px; display: flex; align-items: center;
-            justify-content: center; line-height: 1.4; text-align: center;
+
+        .result-item:hover {
+            background: linear-gradient(to right, #f0f7ff, #e8f1ff);
+            padding-left: 32px;
         }
-        .visible { opacity: 1 !important; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .success { background-color: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
-        .loading { color: #007bff; }
+
+        .result-item:last-child {
+            border-bottom: none;
+            border-radius: 0 0 14px 14px;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: var(--text);
+            font-size: 1.1rem;
+        }
+
+        .item-details {
+            color: var(--text-light);
+            font-size: 0.96rem;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        #result {
+            padding: 20px;
+            border-radius: 14px;
+            font-size: 1.08rem;
+            text-align: center;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            line-height: 1.5;
+            opacity: 0;
+            transition: all 0.5s ease;
+        }
+
+        #result.visible { opacity: 1; }
+
+        .success { background: linear-gradient(to right, #edf7ed, #e0f2e0); color: #2d6a2d; border: 1px solid #c8e6c9; }
+        .error   { background: linear-gradient(to right, #fdecea, #fce0dd); color: #c62828; border: 1px solid #ef9a9a; }
+        .loading { color: var(--primary); background: #ebf3ff; border: 1px solid #90caf9; }
+        .info    { background: #fff8e1; color: #ff8f00; border: 1px solid #ffe082; }
+
+        /* Scrollbar สวย */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f8faff; }
+        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
+
+        @media (max-width: 480px) {
+            .header { padding: 30px 20px; }
+            .header h2 { font-size: 1.75rem; }
+            .content { padding: 28px 22px; }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h2>ระบบ Check-in องค์กร</h2>
-        <p id="api_status" style="font-size: 0.9em; color: gray;">กรุณาใส่ API URL</p>
-        
-        <div id="searchBox">
-            <input 
-                type="text" 
-                id="idInput" 
-                placeholder="พิมพ์รหัสพนักงาน หรือ ชื่อ เพื่อค้นหา..." 
-                required
-                onkeyup="debounceSearch()"
-                autocomplete="off"
-            >
-            <ul id="searchResults">
-                </ul>
-        </div>
-        
-        <div id="result" class="visible success">ระบบพร้อมใช้งาน (กรุณาใส่ API URL)</div>
 
+    <div class="container">
+        <div class="header">
+            <h2>เข้าร่วมกิจกรรม</h2>
+            <p>พิมพ์ชื่อหรือรหัสพนักงานเพื่อลงทะเบียนเข้าร่วม</p>
+        </div>
+
+        <div class="content">
+            <div class="search-box">
+                <input
+                    type="text"
+                    id="idInput"
+                    placeholder="ค้นหาชื่อหรือรหัสพนักงาน..."
+                    autocomplete="off"
+                >
+                <ul id="searchResults"></ul>
+            </div>
+
+            <div id="result" class="visible info">
+                กรุณาพิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา
+            </div>
+        </div>
     </div>
 
-    <script>
-        // *** 🔴 สำคัญ: เปลี่ยน URL นี้เป็น Executable URL ที่ได้จากการ Deploy ใหม่ ***
-        const GAS_API_URL = "https://script.google.com/macros/s/AKfycbxq9RD4fusTdqGHPVRskOU-QLoKzkpeZtJ82vvtnM4OuwWtlqRPHkSVVksI62FiLFKQVg/exec"; 
-        // *************************************************************************
-        
-        var timerId;
-        var resultDiv = document.getElementById('result');
-        var inputField = document.getElementById('idInput');
-        var resultsList = document.getElementById('searchResults');
-        var apiStatus = document.getElementById('api_status');
+    <!-- เปลี่ยนตรงนี้เป็น Web App URL ของคุณเท่านั้น! -->
+    <script type="text/javascript">
+        // <<<=== เปลี่ยนตรงนี้เป็นลิงก์ Web App ของคุณ ===>>>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVPBxWASqL1sNlVXX_jb2mYc4289hIRX96BFfndRH7Tuak_PbM6TNOLnM4TK4m_MasTg/exec";
+ // <<<==================================================>>>
 
-        if (GAS_API_URL.includes("xxxxxxxx")) {
-            apiStatus.innerHTML = '<span style="color:red; font-weight:bold;">❌ กรุณาอัปเดต API URL</span>';
-            showResult({status: 'info', message: 'กรุณาอัปเดต API URL ในโค้ด JavaScript ก่อนใช้งาน'});
-        } else {
-            apiStatus.innerHTML = '<span style="color:green; font-weight:bold;">✅ API พร้อมใช้งาน</span>';
-            showResult({status: 'info', message: 'พิมพ์อย่างน้อย 2 ตัวอักษรเพื่อค้นหา'});
-        }
-        
-        // --- 1. ฟังก์ชันสื่อสารกับ Apps Script (API) ---
-        async function callGasApi(data) {
-            if (GAS_API_URL.includes("xxxxxxxx")) {
-                 showResult({status: 'error', message: 'กรุณาอัปเดต API URL ก่อนใช้งานจริง'});
-                 return null;
-            }
-            
-            try {
-                const response = await fetch(GAS_API_URL, {
-                    method: 'POST',
-                    mode: 'cors', 
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data),
-                });
-                return await response.json();
-            } catch (error) {
-                console.error('API Fetch Error:', error);
-                showResult({status: 'error', message: '❌ ไม่สามารถเชื่อมต่อกับ Google API ได้: ' + error.message});
-                return null;
-            }
-        }
-        // --------------------------------------------------
+        const resultDiv = document.getElementById('result');
+        const inputField = document.getElementById('idInput');
+        const resultsList = document.getElementById('searchResults');
+        let timerId;
 
-        function debounceSearch() {
+        // Debounce การพิมพ์
+        inputField.addEventListener('keyup', () => {
             clearTimeout(timerId);
-            timerId = setTimeout(startSearch, 300);
-        }
-        
-        async function startSearch() {
-            var input = inputField.value.trim();
+            timerId = setTimeout(startSearch, 350);
+        });
+
+        function startSearch() {
+            const query = inputField.value.trim();
             resultsList.innerHTML = '';
-            resultsList.classList.remove('has-results');
-            
-            if (input.length < 2) {
+            resultsList.classList.remove('show');
+
+            if (query.length < 2) {
                 showResult({status: 'info', message: 'พิมพ์อย่างน้อย 2 ตัวอักษรเพื่อค้นหา'});
                 return;
             }
-            
-            showResult({status: 'loading', message: 'กำลังค้นหาผ่าน Google API...'});
 
-            // เรียก API สำหรับค้นหา
-            const employees = await callGasApi({ action: "search", searchTerm: input });
-            
-            if (employees) {
-                displayResults(employees);
-            }
+            showResult({status: 'loading', message: 'กำลังค้นหา...'});
+
+            fetch(`${SCRIPT_URL}?action=search&query=${encodeURIComponent(query)}`)
+                .then(r => r.json())
+                .then(displayResults)
+                .catch(() => showResult({status: 'error', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่'}));
         }
 
-        function displayResults(employees) {
-            resultsList.innerHTML = '';
-            resultDiv.classList.remove('loading');
-            
-            // Check for API Error
-            if (employees && employees.message && employees.status === 'error') {
-                 showResult({status: 'error', message: employees.message}); 
-                 return;
-            }
-
-            if (!employees || employees.length === 0) {
-                showResult({status: 'error', message: 'ไม่พบชื่อ/รหัสที่ตรงกับ "' + inputField.value.trim() + '"'});
+        function displayResults(data) {
+            if (data.error) {
+                showResult({status: 'error', message: data.error});
                 return;
             }
 
-            employees.forEach(function(employee) {
-                var li = document.createElement('li');
+            if (!data || data.length === 0) {
+                showResult({status: 'error', message: 'ไม่พบข้อมูลที่ตรงกับ "' + inputField.value.trim() + '"'});
+                return;
+            }
+
+            data.forEach(emp => {
+                const li = document.createElement('li');
                 li.className = 'result-item';
-                li.innerHTML = '<span class="item-name">' + employee.name + '</span>' + 
-                               '<span class="item-id">รหัส: ' + employee.id + ' | แผนก: ' + employee.dept + '</span>';
-                li.setAttribute('data-id', employee.id);
-                li.onclick = function() {
-                    confirmCheckin(employee.id, employee.name);
-                };
+                li.innerHTML = `
+                    <div class="item-name">${emp.name}</div>
+                    <div class="item-details">รหัสพนักงาน: ${emp.id} | แผนก: ${emp.dept}</div>
+                `;
+                li.onclick = () => confirmCheckin(emp.id, emp.name);
                 resultsList.appendChild(li);
             });
-            
-            resultsList.classList.add('has-results'); 
-            resultDiv.classList.remove('visible'); // ซ่อนข้อความสถานะเมื่อมีผลลัพธ์
+
+            resultsList.classList.add('show');
         }
 
-        async function confirmCheckin(employeeId, employeeName) {
-            resultsList.innerHTML = '';
-            resultsList.classList.remove('has-results');
-            inputField.value = employeeName; 
-            
-            showResult({status: 'loading', message: 'กำลังบันทึก Check-in ผ่าน Google API...'});
-            
-            // เรียก API สำหรับบันทึก
-            const result = await callGasApi({ action: "checkin", employeeId: employeeId });
-            
-            if (result) {
-                handleCheckinResponse(result);
-            }
-        }
-        
-        function handleCheckinResponse(result) {
-            if (result.status === 'success') {
-                showResult(result);
-                inputField.value = ''; // ล้างช่องค้นหาหลัง Check-in สำเร็จ
-                inputField.focus(); 
-            } else {
-                showResult(result);
-            }
+        function confirmCheckin(id, name) {
+            resultsList.classList.remove('show');
+            inputField.value = name;
+            inputField.blur();
+
+            showResult({
+                status: 'loading',
+                message: `กำลังบันทึกการเข้าร่วมของ<br><strong>${name}</strong>...`
+            });
+
+            fetch(`${SCRIPT_URL}?action=checkin&id=${id}`)
+                .then(r => r.json())
+                .then(res => {
+                    showResult(res);
+                    if (res.status === 'success') {
+                        inputField.value = '';
+                        setTimeout(() => inputField.focus(), 800);
+                    }
+                })
+                .catch(() => showResult({status: 'error', message: 'บันทึกไม่สำเร็จ กรุณาลองใหม่'}));
         }
 
-        function showResult(result) {
-            resultDiv.innerHTML = result.message;
-            resultDiv.classList.add('visible');
-            resultDiv.className = 'visible'; 
-
-            if (result.status === 'success') {
-                resultDiv.classList.add('success');
-            } else if (result.status === 'error') {
-                resultDiv.classList.add('error');
-            } else if (result.status === 'loading') {
-                resultDiv.classList.add('loading');
-            } else {
-                resultDiv.classList.add('success'); // 'info' messages
-            }
+        function showResult(res) {
+            resultDiv.innerHTML = res.message || res.error || 'ไม่ทราบสถานะ';
+            resultDiv.className = 'visible ' + (res.status || 'info');
         }
-        
-        // เมื่อคลิกที่อื่น ให้ซ่อนผลการค้นหา
-        document.addEventListener('click', function(event) {
-            if (!event.target.closest('#searchBox')) {
-                resultsList.innerHTML = ''; 
-                resultsList.classList.remove('has-results');
+
+        // ปิด dropdown เมื่อคลิกข้างนอก
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.search-box')) {
+                resultsList.classList.remove('show');
             }
         });
+
+        // โฟกัสอัตโนมัติ
+        window.addEventListener('load', () => inputField.focus());
     </script>
 </body>
 </html>
