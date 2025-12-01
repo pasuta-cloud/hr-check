@@ -3,307 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>เข้าร่วมกิจกรรม | บริษัทของคุณ</title>
-    <meta name="description" content="ระบบลงทะเบียนเข้าร่วมกิจกรรมพนักงาน ด้วย Google Apps Script">
-
-    <!-- ฟอนต์ Prompt ที่โหลดได้แม้ไม่มีเน็ต (GitHub Pages ใช้ได้แน่นอน) -->
+    <title>เข้าร่วมกิจกรรม</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <style>
-        :root {
-            --primary: #003087;
-            --primary-light: #0044cc;
-            --accent: #0066ff;
-            --gray-bg: #f8faff;
-            --gray-border: #e2e8f0;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --shadow: 0 20px 40px rgba(0, 48, 135, 0.12);
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        body {
-            font-family: 'Prompt', sans-serif;
-            background: linear-gradient(135deg, #f0f4ff 0%, #e6ecff 100%);
-            min-height: 100vh;
-            padding: 20px 12px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-        }
-
-        .container {
-            background: #ffffff;
-            width: 100%;
-            max-width: 480px;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            border: 1px solid rgba(0, 48, 135, 0.08);
-        }
-
-        .header {
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
-            color: white;
-            padding: 36px 24px;
-            text-align: center;
-        }
-
-        .header h2 {
-            font-size: 1.9rem;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .header p {
-            margin-top: 10px;
-            font-size: 1.02rem;
-            opacity: 0.95;
-        }
-
-        .content {
-            padding: 32px 28px;
-        }
-
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        #idInput {
-            width: 100%;
-            padding: 19px 24px;
-            font-size: 1.15rem;
-            font-family: 'Prompt', sans-serif;
-            border: 2px solid var(--gray-border);
-            border-radius: 16px;
-            background: #fcfdff;
-            transition: all 0.35s ease;
-        }
-
-        #idInput::placeholder {
-            color: #94a3b8;
-        }
-
-        #idInput:focus {
-            outline: none;
-            border-color: var(--accent);
-            background: white;
-            box-shadow: 0 0 0 5px rgba(0, 102, 255, 0.15);
-            transform: translateY(-2px);
-        }
-
-        #searchResults {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 0 0 16px 16px;
-            max-height: 360px;
-            overflow-y: auto;
-            box-shadow: var(--shadow);
-            border: 2px solid var(--accent);
-            border-top: none;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(-12px);
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 10;
-        }
-
-        #searchResults.show {
-            opacity: 1;
-            visibility: visible;
-            transform: translateY(0);
-        }
-
-        .result-item {
-            padding: 18px 24px;
-            border-bottom: 1px solid #f1f5f9;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .result-item:hover {
-            background: linear-gradient(to right, #f0f7ff, #e8f1ff);
-            padding-left: 32px;
-        }
-
-        .result-item:last-child {
-            border-bottom: none;
-            border-radius: 0 0 14px 14px;
-        }
-
-        .item-name {
-            font-weight: 600;
-            color: var(--text);
-            font-size: 1.1rem;
-        }
-
-        .item-details {
-            color: var(--text-light);
-            font-size: 0.96rem;
-            margin-top: 6px;
-            font-weight: 500;
-        }
-
-        #result {
-            padding: 20px;
-            border-radius: 14px;
-            font-size: 1.08rem;
-            text-align: center;
-            min-height: 70px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 500;
-            line-height: 1.5;
-            opacity: 0;
-            transition: all 0.5s ease;
-        }
-
-        #result.visible { opacity: 1; }
-
-        .success { background: linear-gradient(to right, #edf7ed, #e0f2e0); color: #2d6a2d; border: 1px solid #c8e6c9; }
-        .error   { background: linear-gradient(to right, #fdecea, #fce0dd); color: #c62828; border: 1px solid #ef9a9a; }
-        .loading { color: var(--primary); background: #ebf3ff; border: 1px solid #90caf9; }
-        .info    { background: #fff8e1; color: #ff8f00; border: 1px solid #ffe082; }
-
-        /* Scrollbar สวย */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f8faff; }
-        ::-webkit-scrollbar-thumb { background: var(--primary); border-radius: 3px; }
-
-        @media (max-width: 480px) {
-            .header { padding: 30px 20px; }
-            .header h2 { font-size: 1.75rem; }
-            .content { padding: 28px 22px; }
-        }
+        :root{--primary:#003087;--primary-light:#0044cc;--accent:#0066ff;--gray-border:#e2e8f0;--text:#1e293b;--text-light:#64748b;--shadow:0 20px 40px rgba(0,48,135,.12)}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Prompt',sans-serif;background:linear-gradient(135deg,#f0f4ff,#e6ecff);min-height:100vh;padding:20px 12px;display:flex;justify-content:center;align-items:flex-start}
+        .container{background:#fff;width:100%;max-width:480px;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(0,48,135,.08)}
+        .header{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;padding:36px 24px;text-align:center}
+        .header h2{font-size:1.9rem;font-weight:700}
+        .header p{margin-top:10px;font-size:1.02rem;opacity:.95}
+        .content{padding:32px 28px}
+        .search-box{position:relative;margin-bottom:20px}
+        #idInput{width:100%;padding:19px 24px;font-size:1.15rem;border:2px solid var(--gray-border);border-radius:16px;background:#fcfdff;transition:all .35s}
+        #idInput:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 5px rgba(0,102,255,.15);transform:translateY(-2px);background:#fff}
+        #searchResults{position:absolute;top:100%;left:0;right:0;background:#fff;border-radius:0 0 16px 16px;max-height:360px;overflow-y:auto;box-shadow:var(--shadow);border:2px solid var(--accent);border-top:none;opacity:0;visibility:hidden;transform:translateY(-12px);transition:all .35s;z-index:10}
+        #searchResults.show{opacity:1;visibility:visible;transform:translateY(0)}
+        .result-item{padding:18px 24px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:all .25s}
+        .result-item:hover{background:linear-gradient(to right,#f0f7ff,#e8f1ff);padding-left:32px}
+        .result-item:last-child{border-bottom:none;border-radius:0 0 14px 14px}
+        .item-name{font-weight:600;color:var(--text);font-size:1.1rem}
+        .item-details{color:var(--text-light);font-size:.96rem;margin-top:6px}
+        #result{padding:20px;border-radius:14px;font-size:1.08rem;text-align:center;min-height:70px;display:flex;align-items:center;justify-content:center;font-weight:500;line-height:1.5;opacity:0;transition:all .5s}
+        #result.visible{opacity:1}
+        .success{background:linear-gradient(to right,#edf7ed,#e0f2e0);color:#2d6a2d;border:1px solid #c8e6c9}
+        .error{background:linear-gradient(to right,#fdecea,#fce0dd);color:#c62828;border:1px solid #ef9a9a}
+        .loading{color:var(--primary);background:#ebf3ff;border:1px solid #90caf9}
+        .info{background:#fff8e1;color:#ff8f00;border:1px solid #ffe082}
+        @media(max-width:480px){.header{padding:30px 20px}.header h2{font-size:1.75rem}.content{padding:28px 22px}}
     </style>
 </head>
 <body>
-
     <div class="container">
         <div class="header">
             <h2>เข้าร่วมกิจกรรม</h2>
-            <p>พิมพ์ชื่อหรือรหัสพนักงานเพื่อลงทะเบียนเข้าร่วม</p>
+            <p>พิมพ์ชื่อหรือรหัสพนักงานเพื่อลงทะเบียน</p>
         </div>
-
         <div class="content">
             <div class="search-box">
-                <input
-                    type="text"
-                    id="idInput"
-                    placeholder="ค้นหาชื่อหรือรหัสพนักงาน..."
-                    autocomplete="off"
-                >
+                <input type="text" id="idInput" placeholder="ค้นหาชื่อหรือรหัสพนักงาน..." autocomplete="off">
                 <ul id="searchResults"></ul>
             </div>
-
-            <div id="result" class="visible info">
-                กรุณาพิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา
-            </div>
+            <div id="result" class="visible info">กรุณาพิมพ์ชื่อหรือรหัสพนักงานเพื่อค้นหา</div>
         </div>
     </div>
 
-    <!-- เปลี่ยนตรงนี้เป็น Web App URL ของคุณเท่านั้น! -->
-    <script type="text/javascript">
-        // <<<=== เปลี่ยนตรงนี้เป็นลิงก์ Web App ของคุณ ===>>>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVPBxWASqL1sNlVXX_jb2mYc4289hIRX96BFfndRH7Tuak_PbM6TNOLnM4TK4m_MasTg/exec";
- // <<<==================================================>>>
+    <script>
+        // เปลี่ยนตรงนี้แค่บรรทัดเดียว! ใส่ Web App URL ของคุณ
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwVPBxWASqL1sNlVXX_jb2mYc4289hIRX96BFfndRH7Tuak_PbM6TNOLnM4TK4m_MasTg/exec";
+        // ตัวอย่างจริง: https://script.google.com/macros/s/AKfycbz0L...Z9k/exec
 
         const resultDiv = document.getElementById('result');
         const inputField = document.getElementById('idInput');
         const resultsList = document.getElementById('searchResults');
-        let timerId;
+        let timer;
 
-        // Debounce การพิมพ์
-        inputField.addEventListener('keyup', () => {
-            clearTimeout(timerId);
-            timerId = setTimeout(startSearch, 350);
+        inputField.addEventListener('input', () => {
+            clearTimeout(timer);
+            timer = setTimeout(startSearch, 350);
         });
 
-        function startSearch() {
-            const query = inputField.value.trim();
+        async function startSearch() {
+            const q = inputField.value.trim();
             resultsList.innerHTML = '';
             resultsList.classList.remove('show');
 
-            if (query.length < 2) {
-                showResult({status: 'info', message: 'พิมพ์อย่างน้อย 2 ตัวอักษรเพื่อค้นหา'});
+            if (q.length < 2) {
+                showResult({status:'info', message:'พิมพ์อย่างน้อย 2 ตัวอักษร'});
                 return;
             }
 
-            showResult({status: 'loading', message: 'กำลังค้นหา...'});
+            showResult({status:'loading', message:'กำลังค้นหา...'});
 
-            fetch(`${SCRIPT_URL}?action=search&query=${encodeURIComponent(query)}`)
-                .then(r => r.json())
-                .then(displayResults)
-                .catch(() => showResult({status: 'error', message: 'เกิดข้อผิดพลาดในการเชื่อมต่อ กรุณาลองใหม่'}));
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=search&q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+
+                if (data.status === 'error') throw new Error(data.message);
+                if (!data || data.length === 0) throw new Error('ไม่พบข้อมูลที่ตรงกัน');
+
+                resultsList.innerHTML = '';
+                data.forEach(emp => {
+                    const li = document.createElement('li');
+                    li.className = 'result-item';
+                    li.innerHTML = `<div class="item-name">${emp.name}</div>
+                                    <div class="item-details">รหัส: ${emp.id} | แผนก: ${emp.dept}</div>`;
+                    li.onclick = () => doCheckin(emp.id, emp.name);
+                    resultsList.appendChild(li);
+                });
+                resultsList.classList.add('show');
+
+            } catch (e) {
+                showResult({status:'error', message: e.message || 'เกิดข้อผิดพลาดในการเชื่อมต่อ'});
+            }
         }
 
-        function displayResults(data) {
-            if (data.error) {
-                showResult({status: 'error', message: data.error});
-                return;
-            }
-
-            if (!data || data.length === 0) {
-                showResult({status: 'error', message: 'ไม่พบข้อมูลที่ตรงกับ "' + inputField.value.trim() + '"'});
-                return;
-            }
-
-            data.forEach(emp => {
-                const li = document.createElement('li');
-                li.className = 'result-item';
-                li.innerHTML = `
-                    <div class="item-name">${emp.name}</div>
-                    <div class="item-details">รหัสพนักงาน: ${emp.id} | แผนก: ${emp.dept}</div>
-                `;
-                li.onclick = () => confirmCheckin(emp.id, emp.name);
-                resultsList.appendChild(li);
-            });
-
-            resultsList.classList.add('show');
-        }
-
-        function confirmCheckin(id, name) {
+        async function doCheckin(id, name) {
             resultsList.classList.remove('show');
             inputField.value = name;
-            inputField.blur();
 
-            showResult({
-                status: 'loading',
-                message: `กำลังบันทึกการเข้าร่วมของ<br><strong>${name}</strong>...`
-            });
+            showResult({status:'loading', message:`กำลังบันทึก<br><strong>${name}</strong>...`});
 
-            fetch(`${SCRIPT_URL}?action=checkin&id=${id}`)
-                .then(r => r.json())
-                .then(res => {
-                    showResult(res);
-                    if (res.status === 'success') {
-                        inputField.value = '';
-                        setTimeout(() => inputField.focus(), 800);
-                    }
-                })
-                .catch(() => showResult({status: 'error', message: 'บันทึกไม่สำเร็จ กรุณาลองใหม่'}));
-        }
+            try {
+                const res = await fetch(`${WEB_APP_URL}?action=checkin&id=${id}`);
+                const data = await res.json();
 
-        function showResult(res) {
-            resultDiv.innerHTML = res.message || res.error || 'ไม่ทราบสถานะ';
-            resultDiv.className = 'visible ' + (res.status || 'info');
-        }
+                showResult(data);   // data จะมี {status:"success", message:"..."} หรือ {status:"error", message:"..."}
 
-        // ปิด dropdown เมื่อคลิกข้างนอก
-        document.addEventListener('click', e => {
-            if (!e.target.closest('.search-box')) {
-                resultsList.classList.remove('show');
+                if (data.status === 'success') {
+                    inputField.value = '';
+                    setTimeout(() => inputField.focus(), 800);
+                }
+            } catch (e) {
+                showResult({status:'error', message:'บันทึกไม่สำเร็จ กรุณาลองใหม่'});
             }
+        }
+
+        function showResult(obj) {
+            resultDiv.innerHTML = obj.message;
+            resultDiv.className = 'visible ' + obj.status;
+        }
+
+        document.addEventListener('click', e => {
+            if (!e.target.closest('.search-box')) resultsList.classList.remove('show');
         });
 
-        // โฟกัสอัตโนมัติ
-        window.addEventListener('load', () => inputField.focus());
+        window.onload = () => inputField.focus();
     </script>
 </body>
 </html>
