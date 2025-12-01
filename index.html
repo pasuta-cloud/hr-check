@@ -1,136 +1,124 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>เช็คอินอบรม</title>
-  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root { --p:#1e40af; --a:#3b82f6; --s:#16a34a; }
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{font-family:'Kanit',sans-serif;background:#0f172a;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:15px}
-    .card{background:#fff;color:#000;border-radius:28px;box-shadow:0 20px 50px rgba(0,0,0,0,0.4);width:100%;max-width:480px;overflow:hidden}
-    .h{background:linear-gradient(135deg,var(--p),var(--a));color:#fff;text-align:center;padding:50px 20px}
-    .h h1{font-size:28px;font-weight:700}
-    .h p{font-size:17px;margin-top:8px;opacity:0.9}
-    .b{padding:35px 30px}
-    input{width:100%;padding:20px;font-size:20px;border:2px solid#e2e8f0;border-radius:20px;background:#f8fafc}
-    input:focus{outline:none;border-color:var(--p);box-shadow:0 0 0 5px rgba(59,130,246,0.2)}
-    .r{margin-top:15px;max-height:45vh;overflow-y:auto;border-radius:18px;background:#f8fafc}
-    .i{padding:18px 22px;border-bottom:1px solid#ddd;background:#fff;cursor:pointer;font-size:18px}
-    .i:active{background:#dbeafe;transform:scale(0.98)}
-    .i strong{color:var(--p)}
-    .info{margin-top:30px;padding:30px;background:#eff6ff;border:2px solid#93c5fd;border-radius:20px;text-align:center;display:none}
-    .info h2{font-size:30px;color:var(--p);margin-bottom:10px}
-    .info p{font-size:19px;margin:8px 0}
-    button{margin-top:30px;width:100%;padding:22px;font-size:24px;color:#fff;background:linear-gradient(to right,var(--p),var(--a));border:none;border-radius:20px;box-shadow:0 10px 30px rgba(59,130,246,0.4);cursor:pointer}
-    button:active{transform:scale(0.96)}
-    .ok{display:none;text-align:center;padding:60px 20px}
-    .ok h2{font-size:36px;color:var(--s);margin-bottom:20px}
-    .ok p{font-size:24px;margin:12px 0}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>เช็คอินอบรม</title>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;font-family:'Kanit',sans-serif}
+  body{background:#0f172a;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:10px}
+  .c{background:#fff;border-radius:28px;overflow:hidden;max-width:480px;width:100%;box-shadow:0 20px 50px rgba(0,0,0,0.5)}
+  .h{background:linear-gradient(135deg,#1d4ed8,#2563eb);color:#fff;text-align:center;padding:50px 20px}
+  .h h1{font-size:28px;font-weight:700}
+  .b{padding:30px}
+  input{width:100%;padding:20px;font-size:20px;border:2px solid#ddd;border-radius:20px}
+  input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 5px #dbeafe}
+  .r{margin-top:15px;max-height:45vh;overflow-y:auto;border-radius:18px;background:#f8px solid#eee}
+  .i{padding:18px;background:#fff;border-bottom:1px solid#eee;cursor:pointer;font-size:18px}
+  .i:active{background:#dbeafe}
+  .info{margin-top:30px;padding:30px;background:#eff6ff;border-radius:20px;text-align:center;display:none}
+  .info h2{font-size:30px;color:#1d4ed8;margin-bottom:10px}
+  button{margin-top:25px;width:100%;padding:22px;font-size:24px;background:#1d4ed8;color:#fff;border:none;border-radius:20px;box-shadow:0 10px 30px rgba(29,78,216,0.4);cursor:pointer}
+  button:disabled{background:#94a3b8}
+  .ok{display:none;text-align:center;padding:60px 20px}
+  .ok h2{font-size:36px;color:#16a34a;margin-bottom:20px}
+</style>
 </head>
 <body>
-  <div class="card">
-    <div class="h">
-      <h1>เช็คอินเข้าร่วมอบรม</h1>
-      <p>พิมพ์รหัสหรือชื่อ</p>
-    </div>
-    <div class="b" id="f">
-      <input type="text" id="s" placeholder="ค้นหา รหัส / ชื่อ..." autofocus>
-      <div class="r" id="r"></div>
-      <div class="info" id="i">
-        <h2 id="n"></h2>
-        <p id="d"></p>
-        <p><strong>รหัส:</strong> <span id="id"></span></p>
-        <button onclick="save()">เข้าอบรม</button>
-      </div>
-    </div>
-    <div class="ok" id="ok">
-      <h2>เช็คอินสำเร็จ!</h2>
-      <p id="okn" style="font-size:28px;font-weight:600"></p>
-      <p id="okt" style="font-size:26px;color:var(--s)"></p>
-      <p style="margin-top:30px">ขอให้สนุกกับการอบรมนะคะ</p>
-      <button onclick="location.reload()" style="width:80%;margin-top:20px;padding:18px;font-size:22px">เช็คอินคนถัดไป</button>
+<div class="c">
+  <div class="h">
+    <h1>เช็คอินเข้าร่วมอบรม</h1>
+    <p style="margin-top:10px">พิมพ์รหัสหรือชื่อพนักงาน</p>
+  </div>
+  <div class="b" id="form">
+    <input type="text" id="q" placeholder="ค้นหา..." autofocus>
+    <div class="r" id="res"></div>
+    <div class="info" id="info">
+      <h2 id="n"></h2>
+      <p id="d" style="color:#444"></p>
+      <p><strong>รหัส:</strong> <span id="id"></span></p>
+      <button id="save">เข้าอบรม</button>
     </div>
   </div>
+  <div class="ok" id="ok">
+    <h2>เช็คอินสำเร็จ!</h2>
+    <p id="okname" style="font-size:28px;margin:15px 0;font-weight:600"></p>
+    <p id="oktime" style="font-size:26px;color:#16a34a"></p>
+    <p style="margin-top:30px">ขอให้สนุกกับการอบรม</p>
+    <button onclick="location.reload()" style="margin-top:20px;padding:18px;width:80%;font-size:22px">เช็คอินคนถัดไป</button>
+  </div>
+</div>
 
 <script>
-// เปลี่ยนแค่บรรทัดนี้! ใส่ URL ใหม่ที่ได้จากขั้นตอน 1
-const URL = "https://script.google.com/macros/s/AKfycbyhbJ8bURbAORQ_Wc0M8x0ZfhZs64YRwVMcgIDVJQfMcCpaa-6RVCfR2KgmwwvE_aPtwQ/exec";
+const URL = "https://script.google.com/macros/s/AKfycbyS2RYOlVJwRob4MDTlJD727HZ5QBA-smg2pRDD-OMk6v0gVO6n-Dj4uz1r59tZX6rfeg/exec";
+let person = null;
 
-let sel = null;
+document.getElementById('q').addEventListener('input', function(){
+  let v = this.value.trim();
+  document.getElementById('info').style.display='none';
+  document.getElementById('res').innerHTML = v.length<2 ? '' : '<div class="i">กำลังค้นหา...</div>';
 
-document.getElementById('s').addEventListener('input',()=>{  
-  let k = document.getElementById('s').value.trim();
-  document.getElementById('i').style.display='none';
-  document.getElementById('r').innerHTML = k.length<2 ? '' : '<div class="i">กำลังค้นหา...</div>';
+  if(v.length<2) return;
 
-  if(k.length<2) return;
-
-  fetch(`${URL}?action=search&keyword=${encodeURIComponent(k)}`)
-    .then(res=>res.json())
+  fetch(`${URL}?action=search&keyword=${encodeURIComponent(v)}`)
+    .then(r=>r.json())
     .then(d=>{
-      if(d.length===0){
-        document.getElementById('r').innerHTML='<div class="i">ไม่พบข้อมูล</div>';
-        return;
-      }
-      document.getElementById('r').innerHTML = d.map(e=>`
-        <div class="i" onclick="pick('${e.id}','${e.name}','${e.surname}','${e.dept}')">
-          <strong>${e.id}</strong> - ${e.name} ${e.surname}<br>
-          <small style="color:#64748b">${e.dept}</small>
+      document.getElementById('res').innerHTML = d.length===0 ? '<div class="i">ไม่พบข้อมูล</div>' : d.map(p=>`
+        <div class="i" onclick="sel('${p.id}','${p.name}','${p.surname}','${p.dept}')">
+          <strong>${p.id}</strong> ${p.name} ${p.surname}<br>
+          <small style="color:#666">${p.dept}</small>
         </div>`).join('');
     });
 });
 
-function pick(id,name,surname,dept){
-  sel = {id,name,surname,dept};
+function sel(id,name,surname,dept){
+  person = {id,name,surname,dept};
   document.getElementById('n').textContent = name+' '+surname;
   document.getElementById('d').textContent = dept;
   document.getElementById('id').textContent = id;
-  document.getElementById('i').style.display='block';
-  document.getElementById('r').innerHTML='';
-  document.getElementById('s').value = `${id} - ${name} ${surname}`;
-  document.getElementById('s').blur();
+  document.getElementById('info').style.display='block';
+  document.getElementById('res').innerHTML='';
+  document.getElementById('q').value = `${id} - ${name} ${surname}`;
+  document.getElementById('q').blur();
 }
 
-function save(){
-  if(!sel) return alert("กรุณาเลือกพนักงาน");
+document.getElementById('save').onclick = function(){
+  if(!person) return alert('กรุณาเลือกพนักงาน');
 
-  let b = event.target;
-  let txt = b.textContent;
-  b.disabled=true; b.textContent="กำลังบันทึก...";
+  this.disabled=true;
+  this.textContent='กำลังบันทึก...';
 
   fetch(URL,{
     method:'POST',
     body:JSON.stringify({
       action:'checkin',
-      id:sel.id,
-      name:sel.name,
-      surname:sel.surname,
-      dept:sel.dept
+      id:person.id,
+      name:person.name,
+      surname:person.surname,
+      dept:person.dept
     }),
     headers:{'Content-Type':'application/json'}
   })
   .then(r=>r.json())
   .then(res=>{
     if(res.success){
-      let t = new Date().toLocaleString('th-TH');
-      document.getElementById('f').style.display='none';
-      document.getElementById('okn').textContent = sel.name+' '+sel.surname;
-      document.getElementById('okt').textContent = t;
+      document.getElementById('form').style.display='none';
+      document.getElementById('okname').textContent = person.name+' '+person.surname;
+      document.getElementById('oktime').textContent = new Date().toLocaleString('th-TH');
       document.getElementById('ok').style.display='block';
     }else{
-      alert("ผิดพลาด: "+(res.message||'ไม่ทราบสาเหตุ'));
-      b.disabled=false; b.textContent=txt;
+      alert('ผิดพลาด: '+res.message);
+      this.disabled=false;
+      this.textContent='เข้าอบรม';
     }
   })
   .catch(()=>{
-    alert("ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ได้ กรุณาตรวจสอบอินเทอร์เน็ต");
-    b.disabled=false; b.textContent=txt;
+    alert('ไม่สามารถเชื่อมต่อได้');
+    this.disabled=false;
+    this.textContent='เข้าอบรม';
   });
-}
+};
 </script>
 </body>
 </html>
-
